@@ -1,6 +1,5 @@
 import os
 import time
-from turtle import title
 import requests
 import subprocess
 from datetime import datetime
