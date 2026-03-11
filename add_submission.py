@@ -73,6 +73,23 @@ def get_submission_data(submission_id):
         
     return data.get("data", {}).get("submissionDetails")
 
+def commit_to_git(file_path, code, timestamp, message):
+    """Write to file and perform time-travel commit"""
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(code)
+    
+    dt = datetime.fromtimestamp(int(timestamp))
+    date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
+    
+    subprocess.run(["git", "add", file_path], check=True)
+    
+    env = os.environ.copy()
+    env["GIT_COMMITTER_DATE"] = date_str
+    
+    commit_cmd = ["git", "commit", "--date", date_str, "-m", message]
+    subprocess.run(commit_cmd, env=env, stdout=subprocess.DEVNULL)
+    print(f"Committed: {file_path} (Time: {date_str})")
+
 def main():
     if len(sys.argv) > 1:
         submission_id = sys.argv[1]
@@ -98,22 +115,8 @@ def main():
     ext = EXTENSION_MAP.get(lang_name, f".{lang_name}")
     file_path = os.path.join(folder_name, f"{title_slug}{ext}")
     
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(code)
-    
     # Git
-    dt = datetime.fromtimestamp(int(timestamp))
-    date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
-    commit_message = f"Add/Update {title_slug} ({lang_name})"
-    
-    subprocess.run(["git", "add", file_path], check=True)
-    
-    env = os.environ.copy()
-    env["GIT_COMMITTER_DATE"] = date_str
-    commit_cmd = ["git", "commit", "--date", date_str, "-m", commit_message]
-    subprocess.run(commit_cmd, env=env, stdout=subprocess.DEVNULL)
-
-    print(f"Submission {submission_id} added/updated successfully! (Time: {date_str})")
+    commit_to_git(file_path, code, timestamp, f"Add/Update {title_slug} ({lang_name})")
 
 if __name__ == "__main__":
     main()
