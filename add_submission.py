@@ -34,18 +34,10 @@ def get_submission_data(submission_id):
         
     return data.get("data", {}).get("submissionDetails")
 
-def main():
-    if len(sys.argv) > 1:
-        submission_id = sys.argv[1]
-    else:
-        submission_id = input("Enter the submission ID: ").strip()
-
-    if not submission_id.isdigit():
-        print("ERROR: Submission ID must be a number.")
-        return
-
-    print(f"Fetching details for submission ID: {submission_id}...")
+def process_submission(submission_id):
     submission_details = get_submission_data(submission_id)
+    if not submission_details:
+        return
 
     code = submission_details["code"]
     timestamp = submission_details["timestamp"]
@@ -61,6 +53,22 @@ def main():
     
     # Git
     commit_to_git(file_path, code, timestamp, f"Add/Update {title_slug} ({lang_name})")
+
+def main():
+    if len(sys.argv) > 1:
+        submission_id = sys.argv[1]
+    else:
+        submission_id = input("Enter the submission ID: ").strip()
+
+    if not submission_id.isdigit():
+        print("ERROR: Submission ID must be a number.")
+        return
+
+    print(f"Fetching details for submission ID: {submission_id}...")
+    process_submission(submission_id)
+
+    print("submission processing complete!")
+
 
 if __name__ == "__main__":
     main()
