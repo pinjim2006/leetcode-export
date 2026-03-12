@@ -1,7 +1,7 @@
 import os
 import sys
 import requests
-from config import HEADERS, API_URL, EXTENSION_MAP, commit_to_git
+from config import HEADERS, API_URL, EXTENSION_MAP, TARGET_REPO_PATH, commit_to_git
 
 def get_submission_data(submission_id):
     """Fetch all details of a submission directly using its ID"""
@@ -46,10 +46,10 @@ def process_submission(submission_id):
     title_slug = submission_details["question"]["titleSlug"]
 
     folder_name = f"{question_id.zfill(4)}_{title_slug}"
-    os.makedirs(folder_name, exist_ok=True)
+    os.makedirs(os.path.join(TARGET_REPO_PATH, folder_name), exist_ok=True)
     
     ext = EXTENSION_MAP.get(lang_name, f".{lang_name}")
-    file_path = os.path.join(folder_name, f"{title_slug}{ext}")
+    file_path = os.path.join(TARGET_REPO_PATH, folder_name, f"{title_slug}{ext}")
     
     # Git
     commit_to_git(file_path, code, timestamp, f"Add/Update {title_slug} ({lang_name})")

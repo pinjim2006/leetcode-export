@@ -1,7 +1,7 @@
-import os
 import time
 import requests
-from config import HEADERS, API_URL, EXTENSION_MAP, commit_to_git
+from config import HEADERS, API_URL
+from add_submission import process_submission
 
 def get_all_ac_questions():
     """[Tier 1] Fetch the list of all accepted questions"""
@@ -114,24 +114,6 @@ def get_submissions_for_question(title_slug, frontend_id):
 
     return submissions
 
-def get_submission_code(submission_id):
-    """[Tier 3] Fetch the actual code using the submission ID"""
-    query = """
-    query submissionDetails($submissionId: Int!) {
-        submissionDetails(submissionId: $submissionId) {
-            code
-        }
-    }
-    """
-    payload = {
-        "query": query,
-        "variables": {"submissionId": int(submission_id)}
-    }
-    
-    response = requests.post(API_URL, json=payload, headers=HEADERS)
-    data = response.json()
-    return data.get("data", {}).get("submissionDetails", {}).get("code")
-
 def main():
     print("Fetching LeetCode submissions...")
 
@@ -165,27 +147,7 @@ def main():
     # 4. Start downloading code and writing to Git history
     print("[Tier 3] Downloading code and writing to Git history...")
     for sub in all_ac_submissions:
-        sub_id = sub['id']
-        title_slug = sub['titleSlug']
-        frontend_id = str(sub['frontendId'])
-        timestamp = sub['timestamp']
-        lang_name = sub['langName']
-
-        code = get_submission_code(sub_id)
-        if not code:
-            print(f"   Failed to fetch code (ID: {sub_id})")
-            continue
-        
-        # Build directory and path
-        folder_name = f"{frontend_id.zfill(4)}_{title_slug}"
-        os.makedirs(folder_name, exist_ok=True)
-        
-        ext = EXTENSION_MAP.get(lang_name, f".{lang_name}")
-        file_path = os.path.join(folder_name, f"{title_slug}{ext}")
-        
-        commit_message = f"Add/Update {title_slug} ({lang_name})"
-        commit_to_git(file_path, code, timestamp, commit_message)
-
+        process_submission(sub['id'])
         time.sleep(2)
 
 if __name__ == "__main__":
