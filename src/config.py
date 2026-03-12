@@ -56,11 +56,11 @@ def commit_to_git(file_path, code, timestamp, message):
     dt = datetime.fromtimestamp(int(timestamp))
     date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
     
-    subprocess.run(["git", "add", file_path], check=True)
+    subprocess.run(["git", "add", file_path], cwd=TARGET_REPO_PATH, check=True)
     
     env = os.environ.copy()
     env["GIT_COMMITTER_DATE"] = date_str
     
     commit_cmd = ["git", "commit", "--date", date_str, "-m", message]
-    subprocess.run(commit_cmd, env=env, stdout=subprocess.DEVNULL)
+    subprocess.run(commit_cmd, env=env, cwd=TARGET_REPO_PATH, stdout=subprocess.DEVNULL)
     print(f"Committed: {file_path} (Time: {date_str})")
