@@ -8,6 +8,10 @@ load_dotenv()
 LEETCODE_SESSION = os.getenv("LEETCODE_SESSION")
 CSRF_TOKEN = os.getenv("CSRF_TOKEN")
 
+TARGET_REPO_PATH = os.getenv("TARGET_REPO_PATH")
+TARGET_REPO_PATH = os.path.abspath(TARGET_REPO_PATH)
+os.makedirs(TARGET_REPO_PATH, exist_ok=True)
+
 if not LEETCODE_SESSION or not CSRF_TOKEN:
     print("ERROR: Please set LEETCODE_SESSION and CSRF_TOKEN in the .env file.")
     exit(1)
@@ -42,7 +46,11 @@ EXTENSION_MAP = {
 
 def commit_to_git(file_path, code, timestamp, message):
     """Write to file and perform time-travel commit"""
-    with open(file_path, 'w', encoding='utf-8') as f:
+    full_path = os.path.join(TARGET_REPO_PATH, file_path)
+
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+    with open(full_path, 'w', encoding='utf-8') as f:
         f.write(code)
     
     dt = datetime.fromtimestamp(int(timestamp))
