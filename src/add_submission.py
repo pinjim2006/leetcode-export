@@ -52,7 +52,7 @@ def process_submission(submission_id):
     file_path = os.path.join(TARGET_REPO_PATH, folder_name, f"{title_slug}{ext}")
     
     # Git
-    commit_to_git(file_path, code, timestamp, f"Add/Update {title_slug} ({lang_name})")
+    commit_to_git(file_path, code, timestamp, f"Add/Update {question_id}_{title_slug} ({lang_name})")
 
 def main():
     if len(sys.argv) > 1:
