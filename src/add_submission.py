@@ -14,7 +14,7 @@ def get_submission_data(submission_id):
                 name
             }
             question {
-                questionId
+                questionFrontendId
                 titleSlug
             }
         }
@@ -42,7 +42,7 @@ def process_submission(submission_id):
     code = submission_details["code"]
     timestamp = submission_details["timestamp"]
     lang_name = submission_details["lang"]["name"]
-    question_id = str(submission_details["question"]["questionId"])
+    question_id = str(submission_details["question"]["questionFrontendId"])
     title_slug = submission_details["question"]["titleSlug"]
 
     folder_name = f"{question_id.zfill(4)}_{title_slug}"
